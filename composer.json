@@ -1,0 +1,22 @@
+{
+    "name": "destinylab/astronomytools",
+    "description": "The tools of astronomy",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Lance He",
+            "email": "indigofeather@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.4.0",
+        "destinylab/swetest": "dev-master",
+        "fuelphp/filesystem": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "DestinyLab\\AstronomyTools\\": "src/"
+        }
+    }
+}
