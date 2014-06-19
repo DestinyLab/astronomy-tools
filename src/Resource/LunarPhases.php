@@ -7,13 +7,10 @@ use DestinyLab\AstronomyTools\IPlanets;
 
 class LunarPhases extends Driver
 {
-    const ALL = 'all';
     const NEW_MOON = 'new';
     const FIRST_QUARTER = 'fisrt_quarter';
     const FULL_MOON = 'full';
     const LAST_QUARTER = 'last_quarter';
-
-    protected $baseQuery;
 
     public function __construct(Swetest $swetest)
     {
@@ -25,39 +22,6 @@ class LunarPhases extends Driver
             'eswe',
             'head',
         ];
-    }
-
-    public function calculate($year)
-    {
-        if (! is_int($year)) {
-            throw new \InvalidArgumentException("[{$year}] is Invalid!");
-        }
-
-        $query = [
-            'b' => "1.1.{$year}",
-            'ut' => '00:00:00',
-            'n' => 366,
-        ];
-        $query = array_merge($this->baseQuery, $query);
-        $this->swetest->query($query)->execute();
-        $out = $this->swetest->getOutput();
-        $out = $this->computeAngle($this->dataProcess($out), static::ALL);
-
-        $locateHour = $this->locateUnit($out, static::UNIT_HOUR);
-        $locateMinute = $this->locateUnit($locateHour, static::UNIT_MINUTE);
-        $locateSecond = $this->locateUnit($locateMinute, static::UNIT_SECOND);
-
-        $ret = [];
-        foreach ($locateSecond as $type => $arr) {
-            foreach ($arr as $v) {
-                $dateTime = \DateTime::createFromFormat('d.m.Y H:i:s', $v['date'], new \DateTimeZone('UTC'));
-                $ret['t_'.$dateTime->getTimestamp()] = $type;
-            }
-        }
-
-        ksort($ret);
-
-        return $ret;
     }
 
     protected function computeAngle($data, $type = null)
@@ -75,26 +39,6 @@ class LunarPhases extends Driver
 
             // 日月交朔
             in_array($type, [static::NEW_MOON, static::ALL]) and $this->angleNewMoon($ret, $data, $k, $v);
-        }
-
-        return $ret;
-    }
-
-    protected function locateUnit($data, $unit)
-    {
-        $ret = [];
-        foreach ($data as $type => $arr) {
-            foreach ($arr as $k => $v) {
-                preg_match('/(.*)\s(.*)/', $v['date'], $m);
-                $query = [
-                    'b' => $m[1],
-                    'ut' => $m[2],
-                ];
-                $query = array_merge($this->baseQuery, $query, $this->getUnitQuery($unit));
-                $this->swetest->query($query)->execute();
-                $tmp = $this->computeAngle($this->dataProcess($this->swetest->getOutput()), $type);
-                $ret[$type][$k] = $tmp[$type][0];
-            }
         }
 
         return $ret;

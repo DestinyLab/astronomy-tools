@@ -40,4 +40,19 @@ class Generator
             echo $year.' ';
         }
     }
+
+    public function solarTerms(array $range, $force = false)
+    {
+        $solarTerms = new SolarTerms($this->swetest);
+        foreach ($range as $year) {
+            $file = new File($this->outputPath.$year.'.json');
+            if (! $force and $file->exists()) {
+                continue;
+            }
+
+            $data = $solarTerms->calculate($year);
+            $file->update(json_encode($data));
+            echo $year.' ';
+        }
+    }
 }
