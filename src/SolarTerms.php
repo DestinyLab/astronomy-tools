@@ -2,7 +2,7 @@
 
 namespace DestinyLab\AstronomyTools;
 
-class LunarPhases
+class SolarTerms
 {
     use GetterTrait;
 }

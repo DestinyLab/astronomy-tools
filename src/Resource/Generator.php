@@ -6,6 +6,7 @@ use DestinyLab\Swetest;
 use Fuel\FileSystem\Directory;
 use Fuel\FileSystem\File;
 use InvalidArgumentException;
+use BadMethodCallException;
 
 class Generator
 {
@@ -26,33 +27,30 @@ class Generator
         $this->outputPath = (string) $outputPath;
     }
 
-    public function lunarPhase(array $range, $force = false)
+    public function __call($name, $arguments)
     {
-        $lunarPhases = new LunarPhases($this->swetest);
-        foreach ($range as $year) {
-            $file = new File($this->outputPath.$year.'.json');
-            if (! $force and $file->exists()) {
-                continue;
-            }
-
-            $data = $lunarPhases->calculate($year);
-            $file->update(json_encode($data));
-            echo $year.' ';
+        $class = __NAMESPACE__.'\\'.ucfirst($name);
+        if (! class_exists($class)) {
+            throw new BadMethodCallException('Invalid Method!');
         }
+
+        return $this->generate($class, $arguments[0], $arguments[1]);
     }
 
-    public function solarTerms(array $range, $force = false)
+    protected function generate($class, array $range, $force = false)
     {
-        $solarTerms = new SolarTerms($this->swetest);
+        $object = new $class($this->swetest);
         foreach ($range as $year) {
             $file = new File($this->outputPath.$year.'.json');
             if (! $force and $file->exists()) {
                 continue;
             }
 
-            $data = $solarTerms->calculate($year);
+            $data = $object->calculate($year);
             $file->update(json_encode($data));
             echo $year.' ';
         }
+
+        return true;
     }
 }

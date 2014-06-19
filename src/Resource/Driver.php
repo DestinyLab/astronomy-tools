@@ -45,7 +45,7 @@ abstract class Driver
         foreach ($locateSecond as $type => $arr) {
             foreach ($arr as $v) {
                 $dateTime = \DateTime::createFromFormat('d.m.Y H:i:s', $v['date'], new \DateTimeZone('UTC'));
-                $ret['t_'.$dateTime->getTimestamp()] = $type;
+                $ret[$dateTime->getTimestamp()] = $type;
             }
         }
 
